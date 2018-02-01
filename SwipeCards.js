@@ -473,7 +473,7 @@ export default class SwipeCards extends Component {
     let {pan} = this.state;
 
     let nopeOpacity = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, -(SWIPE_THRESHOLD/2)], outputRange: [1, 0], extrapolate: 'clamp' });
-    let nopeScale = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0], extrapolate: 'clamp' });
+    let nopeScale = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0.25], extrapolate: 'clamp' });
     let animatedNopeStyles = { transform: [{ scale: nopeScale }], opacity: nopeOpacity };
     if (this.props.renderNope) {
       return this.props.renderNope(pan);
@@ -485,7 +485,7 @@ export default class SwipeCards extends Component {
         ? this.props.noView
         : <Text style={[styles.nopeText, this.props.nopeTextStyle]}>{this.props.nopeText}</Text>
 
-      return <Animated.View style={[styles.nope, this.props.nopeStyle, animatedNopeStyles]}>
+      return <Animated.View style={[styles.nope, this.props.nopeStyle, animatedNopeStyles]} pointerEvents={'none'}>
                 {inner}
               </Animated.View>;
     }
@@ -513,7 +513,7 @@ export default class SwipeCards extends Component {
         ? this.props.maybeView
         : <Text style={[styles.maybeText, this.props.maybeTextStyle]}>{this.props.maybeText}</Text>
 
-      return <Animated.View style={[styles.maybe, this.props.maybeStyle, animatedMaybeStyles]}>
+      return <Animated.View style={[styles.maybe, this.props.maybeStyle, animatedMaybeStyles]} pointerEvents={'none'}>
                 {inner}
               </Animated.View>;
     }
@@ -525,7 +525,7 @@ export default class SwipeCards extends Component {
     let {pan} = this.state;
 
     let yupOpacity = pan.x.interpolate({ inputRange: [(SWIPE_THRESHOLD/2), SWIPE_THRESHOLD], outputRange: [0, 1], extrapolate: 'clamp' });
-    let yupScale = pan.x.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0.5, 1], extrapolate: 'clamp' });
+    let yupScale = pan.x.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0.25, 1], extrapolate: 'clamp' });
     let animatedYupStyles = { transform: [{ scale: yupScale }], opacity: yupOpacity };
 
     if (this.props.renderYup) {
@@ -538,7 +538,7 @@ export default class SwipeCards extends Component {
         ? this.props.yupView
         : <Text style={[styles.yupText, this.props.yupTextStyle]}>{this.props.yupText}</Text>;
 
-        return <Animated.View style={[styles.yup, this.props.yupStyle, animatedYupStyles]}>
+        return <Animated.View style={[styles.yup, this.props.yupStyle, animatedYupStyles]} pointerEvents={'none'}>
                 {inner}
               </Animated.View>;
     }
