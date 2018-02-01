@@ -14,8 +14,6 @@ import {
   Image
 } from 'react-native';
 
-import clamp from 'clamp';
-
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
@@ -72,6 +70,12 @@ const styles = StyleSheet.create({
 //Components could be unloaded and loaded and we will loose the users currentIndex, we can persist it here.
 let currentIndex = {};
 let guid = 0;
+
+function clamp(value, min, max) {
+  return min < max
+    ? (value < min ? min : value > max ? max : value)
+    : (value < max ? max : value > min ? min : value)
+}
 
 export default class SwipeCards extends Component {
 
