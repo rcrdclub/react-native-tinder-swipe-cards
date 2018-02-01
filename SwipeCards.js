@@ -127,7 +127,7 @@ export default class SwipeCards extends Component {
     nopeText: "Nope!",
     maybeText: "Maybe!",
     yupText: "Yup!",
-    onClickHandler: () => { alert('tap') },
+    onClickHandler: () => {},
     onDragStart: () => {},
     onDragRelease: () => {},
     cardRemoved: (ix) => null,
@@ -157,6 +157,10 @@ export default class SwipeCards extends Component {
     this.cardAnimation = null;
 
     this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (e, gestureState) => {
+        return true;
+      },
+
       onMoveShouldSetPanResponderCapture: (e, gestureState) => {
         if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
           this.props.onDragStart();
@@ -333,10 +337,12 @@ export default class SwipeCards extends Component {
         this.cardAnimation = null;
       }
 
+      // Reset index to 0
       currentIndex[this.guid] = 0;
+      // console.log(nextProps.cards[0]);
       this.setState({
         cards: [].concat(nextProps.cards),
-        card: nextProps.cards[0]
+        card: nextProps.cards[0]  // this.props.cards[currentIndex[this.guid]]
       });
     }
   }
@@ -369,6 +375,8 @@ export default class SwipeCards extends Component {
   }
 
   renderNoMoreCards() {
+    this._resetState();  // BUG FIX
+
     if (this.props.renderNoMoreCards) {
       return this.props.renderNoMoreCards();
     }
@@ -463,7 +471,6 @@ export default class SwipeCards extends Component {
     let nopeOpacity = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, -(SWIPE_THRESHOLD/2)], outputRange: [1, 0], extrapolate: 'clamp' });
     let nopeScale = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0], extrapolate: 'clamp' });
     let animatedNopeStyles = { transform: [{ scale: nopeScale }], opacity: nopeOpacity };
-
     if (this.props.renderNope) {
       return this.props.renderNope(pan);
     }
@@ -537,7 +544,7 @@ export default class SwipeCards extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, this.props.containerStyle]}>
         {this.props.stack ? this.renderStack() : this.renderCard()}
         {this.renderNope()}
         {this.renderMaybe()}
