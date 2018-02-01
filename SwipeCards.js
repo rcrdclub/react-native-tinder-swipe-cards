@@ -341,6 +341,8 @@ export default class SwipeCards extends Component {
         this.cardAnimation = null;
       }
 
+      this._resetState();  // BUG FIX
+
       // Reset index to 0
       currentIndex[this.guid] = 0;
       // console.log(nextProps.cards[0]);
@@ -379,8 +381,6 @@ export default class SwipeCards extends Component {
   }
 
   renderNoMoreCards() {
-    this._resetState();  // BUG FIX
-
     if (this.props.renderNoMoreCards) {
       return this.props.renderNoMoreCards();
     }
