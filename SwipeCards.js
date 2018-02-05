@@ -17,7 +17,7 @@ import {
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 100;
 
 const styles = StyleSheet.create({
   container: {
@@ -329,7 +329,7 @@ export default class SwipeCards extends Component {
   _animateEntrance() {
     Animated.spring(
       this.state.enter,
-      { toValue: 1, friction: 8 }
+      { toValue: 1, stiffness: 200, damping: 17 }  // friction: 8
     ).start();
   }
 
@@ -356,7 +356,9 @@ export default class SwipeCards extends Component {
   _resetPan() {
     Animated.spring(this.state.pan, {
       toValue: { x: 0, y: 0 },
-      friction: 4
+      stiffness: 200,
+      damping: 17,
+      // friction: 4,
     }).start();
   }
 
@@ -457,8 +459,8 @@ export default class SwipeCards extends Component {
     let {pan, enter} = this.state;
     let [translateX, translateY] = [pan.x, pan.y];
 
-    let rotate = pan.x.interpolate({ inputRange: [-200, 0, 200], outputRange: ["-30deg", "0deg", "30deg"] });
-    let opacity = pan.x.interpolate({ inputRange: [-200, 0, 200], outputRange: [0.5, 1, 0.5] });
+    let rotate = pan.x.interpolate({ inputRange: [-250, 0, 250], outputRange: ["-5deg", "0deg", "5deg"] });
+    let opacity = pan.x.interpolate({ inputRange: [-250, 0, 250], outputRange: [0.5, 1, 0.5] });
 
     let scale = enter;
 
