@@ -17,7 +17,7 @@ import {
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 250;
+const SWIPE_THRESHOLD = 100;
 
 const styles = StyleSheet.create({
   container: {
