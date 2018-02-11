@@ -17,7 +17,7 @@ import {
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 100;
+const SWIPE_THRESHOLD = 200;
 
 const styles = StyleSheet.create({
   container: {
@@ -459,8 +459,8 @@ export default class SwipeCards extends Component {
     let {pan, enter} = this.state;
     let [translateX, translateY] = [pan.x, pan.y];
 
-    let rotate = pan.x.interpolate({ inputRange: [-250, 0, 250], outputRange: ["-5deg", "0deg", "5deg"] });
-    let opacity = pan.x.interpolate({ inputRange: [-250, 0, 250], outputRange: [0.5, 1, 0.5] });
+    let rotate = pan.x.interpolate({ inputRange: [-300, 0, 300], outputRange: ["-2deg", "0deg", "2deg"] });
+    let opacity = pan.x.interpolate({ inputRange: [-300, 0, 300], outputRange: [0.5, 1, 0.5] });
 
     let scale = enter;
 
@@ -475,7 +475,7 @@ export default class SwipeCards extends Component {
     let {pan} = this.state;
 
     let nopeOpacity = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, -(SWIPE_THRESHOLD/2)], outputRange: [1, 0], extrapolate: 'clamp' });
-    let nopeScale = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0.25], extrapolate: 'clamp' });
+    let nopeScale = pan.x.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0.15], extrapolate: 'clamp' });
     let animatedNopeStyles = { transform: [{ scale: nopeScale }], opacity: nopeOpacity };
     if (this.props.renderNope) {
       return this.props.renderNope(pan);
@@ -527,7 +527,7 @@ export default class SwipeCards extends Component {
     let {pan} = this.state;
 
     let yupOpacity = pan.x.interpolate({ inputRange: [(SWIPE_THRESHOLD/2), SWIPE_THRESHOLD], outputRange: [0, 1], extrapolate: 'clamp' });
-    let yupScale = pan.x.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0.25, 1], extrapolate: 'clamp' });
+    let yupScale = pan.x.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0.15, 1], extrapolate: 'clamp' });
     let animatedYupStyles = { transform: [{ scale: yupScale }], opacity: yupOpacity };
 
     if (this.props.renderYup) {
