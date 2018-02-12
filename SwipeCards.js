@@ -17,7 +17,7 @@ import {
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 100;
+const SWIPE_THRESHOLD = 150;
 
 const styles = StyleSheet.create({
   container: {
@@ -256,39 +256,45 @@ export default class SwipeCards extends Component {
     this.cardAnimation = Animated.timing(this.state.pan, {
       toValue: { x: -500, y: 0 },
     }).start(status => {
-      if (status.finished) this._advanceState();
-      else this._resetState();
+      if (status.finished) {
+        this.props.handleNope(this.state.card);
+        this.props.cardRemoved(currentIndex[this.guid]);
+        this._advanceState();
+      } else this._resetState();
 
       this.cardAnimation = null;
     }
       );
-    this.props.cardRemoved(currentIndex[this.guid]);
   }
 
   _forceUpSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
       toValue: { x: 0, y: 500 },
     }).start(status => {
-      if (status.finished) this._advanceState();
-      else this._resetState();
+      if (status.finished) {
+        this.props.handleMaybe(this.state.card);
+        this.props.cardRemoved(currentIndex[this.guid]);
+        this._advanceState();
+      } else this._resetState();
 
       this.cardAnimation = null;
     }
       );
-    this.props.cardRemoved(currentIndex[this.guid]);
   }
 
   _forceRightSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
       toValue: { x: 500, y: 0 },
     }).start(status => {
-      if (status.finished) this._advanceState();
-      else this._resetState();
+      if (status.finished) {
+        this.props.handleYup(this.state.card);
+        this.props.cardRemoved(currentIndex[this.guid]);
+        this._advanceState();
+      } else this._resetState();
 
       this.cardAnimation = null;
     }
       );
-    this.props.cardRemoved(currentIndex[this.guid]);
   }
 
   _goToNextCard() {
@@ -329,7 +335,7 @@ export default class SwipeCards extends Component {
   _animateEntrance() {
     Animated.spring(
       this.state.enter,
-      { toValue: 1, stiffness: 200, damping: 17 }  // friction: 8
+      { toValue: 1, stiffness: 300, damping: 17 }  // friction: 8
     ).start();
   }
 
@@ -356,7 +362,7 @@ export default class SwipeCards extends Component {
   _resetPan() {
     Animated.spring(this.state.pan, {
       toValue: { x: 0, y: 0 },
-      stiffness: 200,
+      stiffness: 300,
       damping: 17,
       // friction: 4,
     }).start();
