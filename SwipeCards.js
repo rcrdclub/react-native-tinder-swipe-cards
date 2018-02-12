@@ -254,7 +254,7 @@ export default class SwipeCards extends Component {
 
   _forceLeftSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
-      toValue: { x: -500, y: 0 },
+      toValue: { x: -700, y: 0 },
     }).start(status => {
       if (status.finished) {
         this.props.handleNope(this.state.card);
@@ -269,7 +269,7 @@ export default class SwipeCards extends Component {
 
   _forceUpSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
-      toValue: { x: 0, y: -500 },
+      toValue: { x: 0, y: -700 },
     }).start(status => {
       if (status.finished) {
         this.props.handleMaybe(this.state.card);
@@ -284,7 +284,7 @@ export default class SwipeCards extends Component {
 
   _forceRightSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
-      toValue: { x: 500, y: 0 },
+      toValue: { x: 700, y: 0 },
     }).start(status => {
       if (status.finished) {
         this.props.handleYup(this.state.card);
