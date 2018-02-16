@@ -187,18 +187,24 @@ export default class SwipeCards extends Component {
       onPanResponderRelease: (e, {vx, vy, dx, dy}) => {
         this.props.onDragRelease()
         this.state.pan.flattenOffset();
-        let velocity;
+        let velocity_x, velocity_y;
         if (Math.abs(dx) <= 5 && Math.abs(dy) <= 5)   //meaning the gesture did not cover any distance
         {
           this.props.onClickHandler(this.state.card)
         }
 
         if (vx > 0) {
-          velocity = clamp(vx, 3, 5);
+          velocity_x = clamp(vx, 3, 5);
         } else if (vx < 0) {
-          velocity = clamp(vx * -1, 3, 5) * -1;
+          velocity_x = clamp(vx * -1, 3, 5) * -1;
         } else {
-          velocity = dx < 0 ? -3 : 3;
+          velocity_x = dx < 0 ? -3 : 3;
+        }
+
+        if (vy < 0) {
+          velocity_y = clamp(vy * -1, 6, 8) * -1;
+        } else {
+          velocity_y = dy < 0 ? -3 : 3;
         }
 
         const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD
@@ -213,10 +219,13 @@ export default class SwipeCards extends Component {
 
           if (hasMovedRight) {
             cancelled = this.props.handleYup(this.state.card);
+            velocity_y = 0;  // Bug fix
           } else if (hasMovedLeft) {
             cancelled = this.props.handleNope(this.state.card);
+            velocity_y = 0;  // Bug fix
           } else if (hasMovedUp && this.props.hasMaybeAction) {
             cancelled = this.props.handleMaybe(this.state.card);
+            velocity_x = 0;  // Bug fix
           } else {
             cancelled = true
           }
@@ -227,18 +236,20 @@ export default class SwipeCards extends Component {
             return;
           };
 
-          this.props.cardRemoved(currentIndex[this.guid]);
-
           if (this.props.smoothTransition) {
+            this.props.cardRemoved(currentIndex[this.guid]);
             this._advanceState();
           } else {
+            console.log('animating card swipe', velocity_x, velocity_y);
             this.cardAnimation = Animated.decay(this.state.pan, {
-              velocity: { x: velocity, y: vy },
+              velocity: { x: velocity_x, y: velocity_y },
               deceleration: 0.98
             });
             this.cardAnimation.start(status => {
-              if (status.finished) this._advanceState();
-              else this._resetState();
+              if (status.finished) {
+                this.props.cardRemoved(currentIndex[this.guid]);
+                this._advanceState();
+              } else this._resetState();
 
               this.cardAnimation = null;
             }
@@ -341,20 +352,21 @@ export default class SwipeCards extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.cards !== this.props.cards) {
-
-      if (this.cardAnimation) {
-        this.cardAnimation.stop();
-        this.cardAnimation = null;
+      // console.log('nextProps', nextProps.cards);
+      // console.log('this.state.cards.length', this.state.cards.length);
+      // console.log('this.state.card', this.state.card);
+      // console.log('currentIndex[this.guid]', currentIndex[this.guid]);
+      // if (this.cardAnimation) {
+      //   this.cardAnimation.stop();
+      //   this.cardAnimation = null;
+      // }
+      const cards = this.state.cards.concat(nextProps.cards);
+      if (!cards[currentIndex[this.guid]] || this.state.card !== cards[currentIndex[this.guid]]) {
+        this._resetState();
       }
-
-      this._resetState();  // BUG FIX
-
-      // Reset index to 0
-      currentIndex[this.guid] = 0;
-      // console.log(nextProps.cards[0]);
       this.setState({
-        cards: [].concat(nextProps.cards),
-        card: nextProps.cards[0]  // this.props.cards[currentIndex[this.guid]]
+        cards,
+        card: cards[currentIndex[this.guid]]
       });
     }
   }
