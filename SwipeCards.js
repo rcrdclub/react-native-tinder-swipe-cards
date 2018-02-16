@@ -227,9 +227,8 @@ export default class SwipeCards extends Component {
             return;
           };
 
-          this.props.cardRemoved(currentIndex[this.guid]);
-
           if (this.props.smoothTransition) {
+            this.props.cardRemoved(currentIndex[this.guid]);
             this._advanceState();
           } else {
             this.cardAnimation = Animated.decay(this.state.pan, {
@@ -237,8 +236,10 @@ export default class SwipeCards extends Component {
               deceleration: 0.98
             });
             this.cardAnimation.start(status => {
-              if (status.finished) this._advanceState();
-              else this._resetState();
+              if (status.finished) {
+                this.props.cardRemoved(currentIndex[this.guid]);
+                this._advanceState();
+              } else this._resetState();
 
               this.cardAnimation = null;
             }
@@ -341,20 +342,21 @@ export default class SwipeCards extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.cards !== this.props.cards) {
-
-      if (this.cardAnimation) {
-        this.cardAnimation.stop();
-        this.cardAnimation = null;
+      // console.log('nextProps', nextProps.cards);
+      // console.log('this.state.cards.length', this.state.cards.length);
+      // console.log('this.state.card', this.state.card);
+      // console.log('currentIndex[this.guid]', currentIndex[this.guid]);
+      // if (this.cardAnimation) {
+      //   this.cardAnimation.stop();
+      //   this.cardAnimation = null;
+      // }
+      const cards = this.state.cards.concat(nextProps.cards);
+      if (!cards[currentIndex[this.guid]] || this.state.card !== cards[currentIndex[this.guid]]) {
+        this._resetState();
       }
-
-      this._resetState();  // BUG FIX
-
-      // Reset index to 0
-      currentIndex[this.guid] = 0;
-      // console.log(nextProps.cards[0]);
       this.setState({
-        cards: [].concat(nextProps.cards),
-        card: nextProps.cards[0]  // this.props.cards[currentIndex[this.guid]]
+        cards,
+        card: cards[currentIndex[this.guid]]
       });
     }
   }
