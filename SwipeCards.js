@@ -98,6 +98,7 @@ export default class SwipeCards extends Component {
     handleYup: PropTypes.func,
     handleMaybe: PropTypes.func,
     handleNope: PropTypes.func,
+    handleDown: PropTypes.func,
     yupText: PropTypes.string,
     yupView: PropTypes.element,
     maybeText: PropTypes.string,
@@ -128,6 +129,7 @@ export default class SwipeCards extends Component {
     handleYup: (card) => null,
     handleMaybe: (card) => null,
     handleNope: (card) => null,
+    handleDown: (card) => null,
     nopeText: "Nope!",
     maybeText: "Maybe!",
     yupText: "Yup!",
@@ -159,6 +161,8 @@ export default class SwipeCards extends Component {
     this.lastY = 0;
 
     this.cardAnimation = null;
+
+    this._onCardReady = this._onCardReady.bind(this);
 
     this._panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (e, gestureState) => {
@@ -243,7 +247,8 @@ export default class SwipeCards extends Component {
             console.log('animating card swipe', velocity_x, velocity_y);
             this.cardAnimation = Animated.decay(this.state.pan, {
               velocity: { x: velocity_x, y: velocity_y },
-              deceleration: 0.98
+              deceleration: 0.98,
+              useNativeDriver: true,
             });
             this.cardAnimation.start(status => {
               if (status.finished) {
@@ -265,7 +270,9 @@ export default class SwipeCards extends Component {
 
   _forceLeftSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
+      duration: 400,
       toValue: { x: -700, y: 0 },
+      useNativeDriver: true,
     }).start(status => {
       if (status.finished) {
         this.props.handleNope(this.state.card);
@@ -280,7 +287,9 @@ export default class SwipeCards extends Component {
 
   _forceUpSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
+      duration: 400,
       toValue: { x: 0, y: -700 },
+      useNativeDriver: true,
     }).start(status => {
       if (status.finished) {
         this.props.handleMaybe(this.state.card);
@@ -295,10 +304,29 @@ export default class SwipeCards extends Component {
 
   _forceRightSwipe() {
     this.cardAnimation = Animated.timing(this.state.pan, {
+      duration: 400,
       toValue: { x: 700, y: 0 },
+      useNativeDriver: true,
     }).start(status => {
       if (status.finished) {
         this.props.handleYup(this.state.card);
+        this.props.cardRemoved(currentIndex[this.guid]);
+        this._advanceState();
+      } else this._resetState();
+
+      this.cardAnimation = null;
+    }
+      );
+  }
+
+  _forceDownSwipe() {
+    this.cardAnimation = Animated.timing(this.state.pan, {
+      duration: 300,
+      toValue: { x: 0, y: 700 },
+      useNativeDriver: true,
+    }).start(status => {
+      if (status.finished) {
+        this.props.handleDown(this.state.card);
         this.props.cardRemoved(currentIndex[this.guid]);
         this._advanceState();
       } else this._resetState();
@@ -340,14 +368,21 @@ export default class SwipeCards extends Component {
   }
 
   componentDidMount() {
+    // this._animateEntrance();
+  }
+
+  _onCardReady() {
     this._animateEntrance();
   }
 
   _animateEntrance() {
-    Animated.spring(
-      this.state.enter,
-      { toValue: 1, stiffness: 300, damping: 17 }  // friction: 8
-    ).start();
+    Animated.spring(this.state.enter, {
+      toValue: 1,
+      stiffness: 300,
+      damping: 17,
+      // friction: 8,
+      useNativeDriver: true,
+    }).start();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -377,6 +412,7 @@ export default class SwipeCards extends Component {
       stiffness: 300,
       damping: 17,
       // friction: 4,
+      useNativeDriver: true,
     }).start();
   }
 
@@ -389,7 +425,7 @@ export default class SwipeCards extends Component {
   _advanceState() {
     this.state.pan.setValue({ x: 0, y: 0 });
     this.state.enter.setValue(0);
-    this._animateEntrance();
+    // this._animateEntrance();
     this._goToNextCard();
   }
 
