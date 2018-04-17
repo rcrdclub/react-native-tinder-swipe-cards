@@ -17,7 +17,7 @@ import {
 import Defaults from './Defaults.js';
 
 const viewport = Dimensions.get('window')
-const SWIPE_THRESHOLD = 150;
+const SWIPE_THRESHOLD = 100;
 
 const styles = StyleSheet.create({
   container: {
@@ -178,7 +178,7 @@ export default class SwipeCards extends Component {
       },
 
       onPanResponderGrant: (e, gestureState) => {
-        this.state.pan.setOffset({ x: this.state.pan.x._value, y: this.state.pan.y._value });
+        // this.state.pan.setOffset({ x: this.state.pan.x._value, y: this.state.pan.y._value });
         this.state.pan.setValue({ x: 0, y: 0 });
       },
 
@@ -189,13 +189,16 @@ export default class SwipeCards extends Component {
       ]),
 
       onPanResponderRelease: (e, {vx, vy, dx, dy}) => {
-        this.props.onDragRelease()
+        this.props.onDragRelease();
         this.state.pan.flattenOffset();
         let velocity_x, velocity_y;
         if (Math.abs(dx) <= 5 && Math.abs(dy) <= 5)   //meaning the gesture did not cover any distance
         {
-          this.props.onClickHandler(this.state.card)
+          this.props.onClickHandler(this.state.card);
         }
+
+        const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD;
+        const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD;
 
         if (vx > 0) {
           velocity_x = clamp(vx, 3, 5);
@@ -205,33 +208,32 @@ export default class SwipeCards extends Component {
           velocity_x = dx < 0 ? -3 : 3;
         }
 
-        if (vy < 0) {
-          velocity_y = clamp(vy * -1, 6, 8) * -1;
+        if ((vy < 0 || hasSwipedVertically) && !hasSwipedHorizontally) {
+          velocity_y = -4;
+          velocity_x = vx;
         } else {
-          velocity_y = dy < 0 ? -3 : 3;
+          velocity_y = vy;
         }
 
-        const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD
-        const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD
         if (hasSwipedHorizontally || (hasSwipedVertically && this.props.hasMaybeAction)) {
 
           let cancelled = false;
 
-          const hasMovedRight = hasSwipedHorizontally && this.state.pan.x._value > 0
-          const hasMovedLeft = hasSwipedHorizontally && this.state.pan.x._value < 0
-          const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0
+          const hasMovedRight = hasSwipedHorizontally && this.state.pan.x._value > 0;
+          const hasMovedLeft = hasSwipedHorizontally && this.state.pan.x._value < 0;
+          const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0;
 
           if (hasMovedRight) {
             cancelled = this.props.handleYup(this.state.card);
-            velocity_y = 0;  // Bug fix
+            // velocity_y = 0;  // Bug fix
           } else if (hasMovedLeft) {
             cancelled = this.props.handleNope(this.state.card);
-            velocity_y = 0;  // Bug fix
+            // velocity_y = 0;  // Bug fix
           } else if (hasMovedUp && this.props.hasMaybeAction) {
             cancelled = this.props.handleMaybe(this.state.card);
-            velocity_x = 0;  // Bug fix
+            // velocity_x = 0;  // Bug fix
           } else {
-            cancelled = true
+            cancelled = true;
           }
 
           //Yup or nope was cancelled, return the card to normal.
@@ -247,7 +249,7 @@ export default class SwipeCards extends Component {
             console.log('animating card swipe', velocity_x, velocity_y);
             this.cardAnimation = Animated.decay(this.state.pan, {
               velocity: { x: velocity_x, y: velocity_y },
-              deceleration: 0.98,
+              deceleration: 0.99,
               useNativeDriver: true,
             });
             this.cardAnimation.start(status => {
