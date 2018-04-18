@@ -28,12 +28,6 @@ const styles = StyleSheet.create({
   },
   yup: {
     borderColor: 'green',
-    borderWidth: 2,
-    position: 'absolute',
-    padding: 20,
-    bottom: 20,
-    borderRadius: 5,
-    right: 0,
   },
   yupText: {
     fontSize: 16,
@@ -41,12 +35,6 @@ const styles = StyleSheet.create({
   },
   maybe: {
     borderColor: 'blue',
-    borderWidth: 2,
-    position: 'absolute',
-    padding: 20,
-    bottom: 20,
-    borderRadius: 5,
-    right: 20,
   },
   maybeText: {
     fontSize: 16,
@@ -54,12 +42,6 @@ const styles = StyleSheet.create({
   },
   nope: {
     borderColor: 'red',
-    borderWidth: 2,
-    position: 'absolute',
-    bottom: 20,
-    padding: 20,
-    borderRadius: 5,
-    left: 0,
   },
   nopeText: {
     fontSize: 16,
