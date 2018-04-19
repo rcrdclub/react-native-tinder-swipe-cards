@@ -153,13 +153,13 @@ export default class SwipeCards extends Component {
 
       onMoveShouldSetPanResponderCapture: (e, gestureState) => {
         if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
-          this.props.onDragStart();
           return true;
         }
         return false;
       },
 
       onPanResponderGrant: (e, gestureState) => {
+        this.props.onDragStart();
         // this.state.pan.setOffset({ x: this.state.pan.x._value, y: this.state.pan.y._value });
         this.state.pan.setValue({ x: 0, y: 0 });
       },
